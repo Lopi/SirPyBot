@@ -22,7 +22,7 @@ ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IRC Socket
 # Functions are defined below
 
 def banner(): # Displayed when the program starts
-  title = 'Sir PyBot'
+  title = 'SirPyBot'
   version = 'Version 0.1'
   contact = 'chris[dot]spehn[at]gmail[dot]com'
   print '\n' + title.center(45)
@@ -30,9 +30,9 @@ def banner(): # Displayed when the program starts
   print '\n' + contact.center(45)
 
 def usage(): # Usage information
-  print '\nISUSecBot: You can\'t run ISUSecBot using that snytax!'
-  print '\nUsage: ./isusecbot.py server port channel nickname'
-  print '\nExample: ./isusecbot.py irc.freenode.net 6667 isusec ISUSecBot'
+  print '\nSirPyBot: You can\'t run SirPyBot using that snytax!'
+  print '\nUsage: ./SirPyBot.py server port channel nickname'
+  print '\nExample: ./SirPyBot.py irc.freenode.net 6667 isusec SirPyBot'
 
 def ping(): # Function to respond to server pings
   ircsock.send('PONG :pingis\n')
