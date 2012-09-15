@@ -92,6 +92,7 @@ def main():
     ircmsg = ircsock.recv(2048) # Receive data from the server
     ircmsg = ircmsg.strip('\n\r') # Remove linebreaks
     print(ircmsg) # Print server's messages
+    get_external_ip() # Announces where the bot is connecting from  
   
     if ircmsg.find(':Hello '+ botnick) != -1: # Calls hello() if 'Hello BotName' is found
       hello()
