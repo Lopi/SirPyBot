@@ -86,13 +86,13 @@ def main():
   os.system('clear') # Clear the screen
   banner() # Print the banner
   connect() # Connect to the Server
+  get_external_ip() # Announces where the bot is connecting from  
 
   while 1: # WARNING: May cause an infinite loop
 
     ircmsg = ircsock.recv(2048) # Receive data from the server
     ircmsg = ircmsg.strip('\n\r') # Remove linebreaks
     print(ircmsg) # Print server's messages
-    get_external_ip() # Announces where the bot is connecting from  
   
     if ircmsg.find(':Hello '+ botnick) != -1: # Calls hello() if 'Hello BotName' is found
       hello()
