@@ -66,10 +66,6 @@ def get_external_ip(): # Function to get external ip address
     print 'There was a problem with the URL: ' + e
     sendmsg(channel, 'There was a problem with the URL: ' + e)
 
-  except urllib2.IOError, e:
-    print 'There was an IOError ' + e
-    sendmsg(channel, 'There was an IOError: ' + e)
-
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
