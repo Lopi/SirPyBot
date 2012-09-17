@@ -14,7 +14,6 @@ import platform # System info gathering
 import locale # System language
 import urllib2 # Used to get external ip address
 import argparse # CLI arg parsing
-import time # For sleep()
 import subprocess # Spawn subprocesses
 from pastebin import PastebinAPI
 
