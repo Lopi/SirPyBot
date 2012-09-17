@@ -13,13 +13,23 @@ import platform # System info gathering
 import locale # System language
 import urllib2 # Used to get external ip address
 import psutil # List processes
+import argparse # CLI arg parsing
+
+# CLI options
+parser = argparse.ArgumentParser()
+parser.add_argument('server', help='IRC Server IP Address')
+parser.add_argument('port', help='IRC Server Port')
+parser.add_argument('channel', help='IRC Server Channel')
+parser.add_argument('nick', help='Nickname')
+args = parser.parse_args()
 
 # Global variables to configure the bot        
-server = sys.argv[1]  # Server
-port = sys.argv[2]    # Port
-channel = '#' + sys.argv[3] # Channel
-botnick = sys.argv[4] # Nickname
+server = args.server  # Server
+port = args.port    # Port
+channel = '#' + args.channel # Channel
+botnick = args.nick # Nickname
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IRC Socket
+
 
 # Functions are defined below
 
@@ -30,11 +40,6 @@ def banner(): # Displayed when the program starts
   print '\n' + title.center(45)
   print '\n' + version.center(45)
   print '\n' + contact.center(45)
-
-def usage(): # Usage information
-  print '\nSirPyBot: You can\'t run SirPyBot using that snytax!'
-  print '\nUsage: ./SirPyBot.py server port channel nickname'
-  print '\nExample: ./SirPyBot.py irc.freenode.net 6667 isusec SirPyBot'
 
 def ping(): # Function to respond to server pings
   ircsock.send('PONG :pingis\n')
@@ -115,10 +120,4 @@ def main():
 
     if ircmsg.find(':pslist '+ botnick) != -1: # Calls pslist() if 'getip BotName' is found
       pslist()
-
-if __name__ == '__main__':
-  if len(sys.argv) != 5:  
-    usage()
-    sys.exit(1)
-  else:
-    main()
+main()
