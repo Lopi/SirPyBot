@@ -40,7 +40,7 @@ ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IRC Socket
 
 def banner(): # Displayed when the program starts
   title = 'SirPyBot'
-  version = 'Version 0.1'
+  version = 'Version 0.2'
   contact = 'chris[dot]spehn[at]gmail[dot]com'
   print '\n' + title.center(45)
   print '\n' + version.center(45)
