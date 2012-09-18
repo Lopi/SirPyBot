@@ -5,6 +5,12 @@ Description: IRC Bot
 Author: Lopi
 Contributors: b0b (Windows stuffs)
 Version: 0.2
+TODO: upload
+      download
+      ls -lahF /directory/you/want (dir equivalent)
+      execute shell commands
+      idle time
+      help
 '''
 # Libraries
 import socket # Communicate with irc server
