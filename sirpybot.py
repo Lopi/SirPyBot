@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 '''
 Name: sirpybot.py
 Description: IRC Bot
@@ -7,15 +7,15 @@ Contributors: b0b (Windows stuffs)
 Version: 0.2
 TODO: upload
       download
-      ls -lahF /directory/you/want (dir equivalent) -akama: tested and verifed on linux./might have broken it again.
+      ls -lahF /directory/you/want (dir equivalent) -- Fixed to work on Linux
       execute shell commands
-      idle time -akama: uptime completed/don't know if time since user interaction is possible in linux
-      help 
 
+TESTING:
 
-Windows Functions to be test:
-	uptime
-	ls
+Windows
+--------
+uptime
+ls
 
 '''
 # Libraries
@@ -27,7 +27,7 @@ import locale # System language
 import urllib2 # Used to get external ip address
 import argparse # CLI arg parsing
 import subprocess # Spawn subprocesses
-from pastebin import PastebinAPI
+from pastebin import PastebinAPI # Paste to pastebin
 
 # CLI options
 parser = argparse.ArgumentParser()
@@ -38,7 +38,7 @@ parser.add_argument('nick', help='Nickname')
 args = parser.parse_args()
 
 # Global variables to configure the bot 
-pastebin_api_key = '---INSERT KEY HERE---'    
+pastebin_api_key = '-----INSERT KEY HERE-----'    
 server = args.server  # Server
 port = args.port    # Port
 channel = '#' + args.channel # Channel
@@ -139,7 +139,6 @@ def ifconfig(): # Displays network interfaces
 # Error check might not work
 def ls(dir): # Directory listing
   if (str(platform.platform()))[0:3]=="Win":
-    
     p = subprocess.Popen(['dir',dir], shell=False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
@@ -152,20 +151,19 @@ def ls(dir): # Directory listing
 
     sendmsg(channel, url)
   else:
+    x = PastebinAPI()
     p = subprocess.Popen(['ls', dir, '-lahF'], shell=False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
-    sendmsg('akama', paste_code)
-    if paste_code.find('No such file') == -1:
-       x = PastebinAPI()
-       url = x.paste(pastebin_api_key,
-                     paste_code,
-                     paste_name = 'ls -lahF', 
-                     paste_private = 'unlisted',
-                     paste_expire_date = '10M')
-       sendmsg(channel, url)
+    if paste_code == '':
+       sendmsg(channel, 'No such file or directory')
     else:
-       sendmsg(channel, 'empty file, sorry')
+      url = x.paste(pastebin_api_key,
+                       paste_code,
+                       paste_name = 'ls -lahF', 
+                       paste_private = 'unlisted',
+                       paste_expire_date = '10M')
+      sendmsg(channel, url)
 
 def uptime(): #Check the uptime of the box that the bot is running on.
   if (str(platform.platform())) [0:3]=="Win":
@@ -182,6 +180,9 @@ def uptime(): #Check the uptime of the box that the bot is running on.
  
 def pwd(): # Print working directory
   sendmsg(channel, os.getcwd())
+
+def help(): # Tells the bot owner what commands are available
+  sendmsg(channel, 'The following commands are available: hello | sysinfo | getip | pslist | ifconfig | pwd | uptime | ls')
 
 def sendmsg(chan , msg): # Function to send messages to the channel
   ircsock.send('PRIVMSG '+ chan +' :'+ msg +'\n')
@@ -210,31 +211,34 @@ def main():
     ircmsg = ircmsg.strip('\n\r') # Remove linebreaks
     print(ircmsg) # Print server's messages
   
-    if ircmsg.find(':Hello '+ botnick) != -1: # Calls hello() if 'Hello BotName' is found
+    if ircmsg.find(':!hello') != -1: # Calls hello() if 'hello BotName' is found
       hello()
 
     if ircmsg.find('PING :') != -1: # Respond to server pings
       ping()
 
-    if ircmsg.find(':sysinfo '+ botnick) != -1: # Calls sysinfo() if 'sysinfo BotName' is found
+    if ircmsg.find(':!sysinfo') != -1: # Calls sysinfo() if 'sysinfo BotName' is found
       sysinfo()    
 
-    if ircmsg.find(':getip '+ botnick) != -1: # Calls get_external_ip() if 'getip BotName' is found
+    if ircmsg.find(':!getip') != -1: # Calls get_external_ip() if 'getip BotName' is found
       get_external_ip()
 
-    if ircmsg.find(':pslist '+ botnick) != -1: # Calls pslist() if 'pslist BotName' is found
+    if ircmsg.find(':!pslist') != -1: # Calls pslist() if 'pslist BotName' is found
       pslist()
 
-    if ircmsg.find(':ifconfig '+ botnick) != -1: # Calls pslist() if 'ifconfig BotName' is found
+    if ircmsg.find(':!ifconfig') != -1: # Calls pslist() if 'ifconfig BotName' is found
       ifconfig()
 
-    if ircmsg.find(':pwd '+ botnick) != -1: # Calls pwd() if 'pwd BotName' is found
+    if ircmsg.find(':!pwd') != -1: # Calls pwd() if 'pwd BotName' is found
       pwd()
 
-    if ircmsg.find(':uptime ' + botnick) != -1: # Calls uptime() if 'uptime BotName' is found
+    if ircmsg.find(':!uptime') != -1: # Calls uptime() if 'uptime BotName' is found
       uptime()
 
-    if ircmsg.find(':ls ' + botnick) != -1: # Calls ls() if 'pwd BotName' is found
+    if ircmsg.find(':!ls ') != -1: # Calls ls() if 'pwd BotName' is found
       dir = (ircmsg.split(" ")[len(ircmsg.split(" "))-1])
       ls(dir)
+
+    if ircmsg.find(':!help') != -1: # Calls ls() if 'pwd BotName' is found
+      help()
 main()
