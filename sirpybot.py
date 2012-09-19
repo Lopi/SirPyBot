@@ -1,9 +1,8 @@
-
 '''
 Name: sirpybot.py
 Description: IRC Bot
 Author: Lopi
-Contributors: b0b (Windows stuffs)
+Contributors: b0b (windows stuff), akama (uptime and ls)
 Version: 0.2
 TODO: upload
       download
